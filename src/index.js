@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
+import {ButtonToolbar, Button, Dropdown, DropdownButton} from 'react-bootstrap';
 
 class Box extends Component {
   selectBox = () => {
@@ -18,7 +19,7 @@ class Box extends Component {
 class Grid extends Component {
 
   render() {
-    const width = (this.props.cols * 16);
+    const width = (this.props.cols * 14);
     let rowsArr = [];
 
     let boxClass = "";
@@ -43,6 +44,33 @@ class Grid extends Component {
     return <div className="grid" style={{width: width}}>
       {rowsArr}
     </div>;
+  }
+}
+
+class Buttons extends Component {
+
+  handleSelect = (evt) => {
+    this.props.gridSize(evt)
+  }
+  
+  render() { 
+    return ( 
+      <div className="center">
+        <ButtonToolbar aria-label="Toolbar with button groups">
+          <Button className="btn btn-default" onClick={this.props.playButton}>Play</Button>
+          <Button className="btn btn-default" onClick={this.props.pauseButton}>Pause</Button>
+          <Button className="btn btn-default" onClick={this.props.clear}>Clear</Button>
+          <Button className="btn btn-default" onClick={this.props.slow}>Slow</Button>
+          <Button className="btn btn-default" onClick={this.props.fast}>Fast</Button>
+          <Button className="btn btn-default" onClick={this.props.seed}>Seed</Button>
+          <DropdownButton title="Grid Size" id="size-menu" onSelect={this.handleSelect}>
+          <Dropdown.Item eventKey="1">20x10</Dropdown.Item>
+          <Dropdown.Item eventKey="2">50x30</Dropdown.Item>
+          <Dropdown.Item eventKey="3">70x50</Dropdown.Item>
+          </DropdownButton>
+        </ButtonToolbar>
+      </div>
+     );
   }
 }
 
@@ -90,6 +118,41 @@ class Main extends Component {
     clearInterval(this.intervalId)
   }
 
+  slow = () => {
+    this.speed = 1000;
+    this.playButton()
+  }
+
+  fast = () => {
+    this.speed = 100;
+    this.playButton()
+  }
+  
+  clear = () => {
+    var grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
+    this.setState({
+      gridFull: grid,
+      generation: 0
+    })
+  }
+
+  gridSize = (size) => {
+    switch(size) {
+      case "1":
+        this.cols = 20;
+        this.rows = 10;
+      break;
+      case "2":
+        this.cols = 50;
+        this.rows = 30;
+      break;
+      default:
+        this.cols = 70;
+        this.rows = 50;
+    }
+    this.clear()
+  }
+
   play = () => {
     let g = this.state.gridFull
     let g2 = arrayClone(this.state.gridFull);
@@ -124,6 +187,15 @@ class Main extends Component {
     return (
       <div>
         <h1>Conway's Game of Life</h1>
+        <Buttons
+          playButton={this.playButton}
+          pauseButton={this.pauseButton}
+          slow={this.slow}
+          fast={this.fast}
+          clear={this.clear}
+          seed={this.seed}
+          gridSize={this.gridSize}
+        />
         <Grid 
           gridFull={this.state.gridFull}
           cols={this.cols}
