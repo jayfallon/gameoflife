@@ -3,13 +3,22 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
-class Grid extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+class Box extends Component {
+  selectBox = () => {
+    this.props.selectBox(this.props.row, this.props.col)
   }
+  render() { 
+    return ( 
+      <div className={this.props.boxClass} id={this.props.id} onClick={this.selectBox}/>
+     );
+  }
+}
+
+
+class Grid extends Component {
+
   render() {
-    const width = this.props.cols * 14
+    const width = (this.props.cols * 16) + 1
     let rowsArr = []
     let boxClass = ""
     for (let i = 0; i < this.props.rows; i++) {
@@ -31,7 +40,7 @@ class Grid extends Component {
 
 
     return <div className="grid" style={{width: width}}>
-      {{rowsArr}}
+      {rowsArr}
     </div>;
   }
 }
@@ -49,18 +58,16 @@ class Main extends Component {
     };
   }
   render() {
-    const {rows,cols} = this.props;
-    const {gridFull, generation} = this.state;
     return (
       <div>
-        <h1>The Game of Life</h1>
+        <h1>Conway's Game of Life</h1>
         <Grid 
-          gridFull={gridFull}
-          cols={cols}
-          rows={rows}
+          gridFull={this.state.gridFull}
+          cols={this.cols}
+          rows={this.rows}
           selectBox={this.selectBox}
          />
-        <h2>generations: {generation}</h2>
+        <h2>generations: {this.state.generation}</h2>
       </div>
     );
   }
